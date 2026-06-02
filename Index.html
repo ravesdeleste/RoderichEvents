@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<title>RoderichEvents ⚡</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07070f;--sf:#0d0d1a;--card:#131325;--card2:#1a1a2e;
+  --b1:rgba(255,255,255,0.07);--b2:rgba(255,255,255,0.14);
+  --ac:#7c3aed;--adm:rgba(124,58,237,0.15);--a2:#a855f7;
+  --gld:#f59e0b;--grn:#10b981;--grdm:rgba(16,185,129,0.15);
+  --red:#ef4444;--rdm:rgba(239,68,68,0.14);
+  --orn:#f97316;--odm:rgba(249,115,22,0.14);
+  --blu:#60a5fa;--bdm:rgba(96,165,250,0.12);
+  --tx:#e2e8f0;--mu:#7c8794;--dm:#3d4455;
+  --r:12px;--rs:8px;--rx:5px;--sw:215px
+}
+body{background:var(--bg);color:var(--tx);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;height:100vh;display:flex;font-size:14px;line-height:1.5;overflow:hidden}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-thumb{background:var(--b2);border-radius:2px}
+a{text-decoration:none}option{background:#1a1a2e;color:var(--tx)}
+#sb{width:var(--sw);height:100vh;background:var(--sf);border-right:1px solid var(--b1);display:flex;flex-direction:column;flex-shrink:0}
+.brand{padding:18px 14px 14px;border-bottom:1px solid var(--b1)}
+.blogo{width:36px;height:36px;background:linear-gradient(135deg,var(--ac),var(--a2));border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:8px}
+.bname{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.bsub{font-size:10px;color:var(--mu);margin-top:2px}
+.navs{padding:10px 8px;flex:1;overflow-y:auto}
+.nlbl{font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--dm);text-transform:uppercase;padding:0 8px;margin:12px 0 4px}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:var(--rs);cursor:pointer;color:var(--mu);font-size:13px;font-weight:500;transition:all .15s;margin-bottom:2px;position:relative;user-select:none}
+.ni:hover{background:var(--card);color:var(--tx)}
+.ni.act{background:var(--adm);color:var(--a2)}
+.ni.act::before{content:'';position:absolute;left:0;top:25%;bottom:25%;width:3px;background:var(--ac);border-radius:0 2px 2px 0}
+.ni i{width:15px;text-align:center;font-size:12px}
+.nbadge{margin-left:auto;background:var(--ac);color:#fff;font-size:9px;font-weight:700;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center}
+.upnl{padding:10px;border-top:1px solid var(--b1);position:relative}
+.ulbl{font-size:9px;color:var(--dm);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.ubtn{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--rs);cursor:pointer;background:var(--card);border:1px solid var(--b1);transition:all .15s}
+.ubtn:hover{border-color:var(--ac)}
+.uav{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.uname{font-size:12px;font-weight:600;color:var(--tx)}.urole{font-size:10px;color:var(--mu)}
+.udrop{position:absolute;bottom:calc(100% + 4px);left:10px;right:10px;background:var(--card2);border:1px solid var(--b2);border-radius:var(--rs);overflow:hidden;box-shadow:0 -10px 30px rgba(0,0,0,.7);z-index:200;display:none}
+.udrop.open{display:block}
+.udi{display:flex;align-items:center;gap:10px;padding:10px 12px;cursor:pointer;transition:background .1s;font-size:13px}
+.udi:hover{background:var(--card)}.udi.sel{background:var(--adm);color:var(--a2)}
+#main{flex:1;overflow-y:auto;padding:22px;height:100vh}
+.ph{margin-bottom:18px;display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.ptitle{font-size:21px;font-weight:700}.psub{font-size:12px;color:var(--mu);margin-top:2px}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.sc{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:14px 16px}
+.sl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.sv{font-size:24px;font-weight:700;line-height:1}.sd{font-size:11px;color:var(--mu);margin-top:4px}
+.tg3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px}
+.tmc{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:14px}
+.tmh{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.tmav{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.tmn{font-size:13px;font-weight:600}.tmr{font-size:10px;color:var(--mu)}
+.tmst{display:flex;gap:12px}.tmstv{font-size:20px;font-weight:700}.tmstl{font-size:9px;color:var(--mu)}
+.stitle{font-size:10px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.1em;margin:18px 0 10px;display:flex;align-items:center;gap:8px}
+.stitle::after{content:'';flex:1;height:1px;background:var(--b1)}
+.tc{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:12px 14px;margin-bottom:6px;display:flex;align-items:flex-start;gap:11px;transition:all .15s}
+.tc:hover{border-color:var(--b2);background:var(--card2)}
+.tc.done{opacity:.42}.tc.done .tt{text-decoration:line-through;color:var(--mu)}.tc.cancelled{opacity:.32}
+.chk{width:19px;height:19px;border-radius:50%;border:2px solid var(--b2);flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;margin-top:2px}
+.chk:hover{border-color:var(--grn)}.chk.done{background:var(--grn);border-color:var(--grn)}
+.chk.prog{background:var(--blu);border-color:var(--blu)}.chk.cancelled{background:var(--dm);border-color:var(--dm)}
+.chk i{font-size:9px;color:#fff}
+.tb{flex:1;min-width:0}.tt{font-size:13px;font-weight:500;margin-bottom:6px;line-height:1.3}
+.tm{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.tnotes{font-size:11px;color:var(--mu);margin-top:5px;padding-top:5px;border-top:1px solid var(--b1);font-style:italic}
+.tacts{display:flex;gap:3px;opacity:0;transition:opacity .15s;flex-shrink:0}
+.tc:hover .tacts{opacity:1}
+.tab2{width:26px;height:26px;border-radius:var(--rx);border:1px solid var(--b1);background:var(--sf);color:var(--mu);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:10px;transition:all .15s}
+.tab2:hover{border-color:var(--b2);color:var(--tx)}.tab2.red:hover{border-color:var(--red);color:var(--red)}
+.tag{display:inline-flex;align-items:center;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:600}
+.ta{background:var(--bdm);color:var(--blu)}.tpa{background:var(--rdm);color:var(--red)}
+.tpm{background:var(--odm);color:var(--orn)}.tpb{background:var(--grdm);color:var(--grn)}
+.tsp{background:rgba(100,116,139,.12);color:#94a3b8}.tsi{background:var(--bdm);color:var(--blu)}
+.tsl{background:var(--grdm);color:var(--grn)}.tsc{background:rgba(100,116,139,.08);color:var(--dm)}
+.atag{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:var(--mu)}
+.adot{width:15px;height:15px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700}
+.fb{display:flex;gap:7px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.fsel,.sinput{background:var(--card);border:1px solid var(--b1);color:var(--tx);padding:7px 11px;border-radius:var(--rs);font-size:12px;outline:none;transition:border .15s;cursor:pointer;font-family:inherit}
+.fsel:focus,.sinput:focus{border-color:var(--ac)}.sinput{flex:1;min-width:140px}.sinput::placeholder{color:var(--dm)}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:var(--rs);font-size:12px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:inherit;white-space:nowrap}
+.btnp{background:var(--ac);color:#fff}.btnp:hover{background:var(--a2)}
+.btng{background:transparent;border:1px solid var(--b1);color:var(--mu)}.btng:hover{border-color:var(--b2);color:var(--tx);background:var(--card)}
+.btns{background:var(--grdm);border:1px solid var(--grn);color:var(--grn)}.btns:hover{background:var(--grn);color:#fff}
+#mo{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(5px);z-index:500;display:none;align-items:center;justify-content:center}
+#mo.open{display:flex}
+#md{background:var(--card2);border:1px solid var(--b2);border-radius:var(--r);padding:22px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.8)}
+.mtitle{font-size:16px;font-weight:700;margin-bottom:18px}
+.fg{margin-bottom:12px}.fl{font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;display:block}
+.fi,.fse,.ft{width:100%;background:var(--sf);border:1px solid var(--b1);color:var(--tx);padding:8px 11px;border-radius:var(--rs);font-size:13px;outline:none;transition:border .15s;font-family:inherit}
+.fi:focus,.fse:focus,.ft:focus{border-color:var(--ac)}.ft{resize:vertical;min-height:60px}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.macts{display:flex;gap:7px;justify-content:flex-end;margin-top:16px}
+.gsbox{position:relative;margin-bottom:18px}
+.gsi{width:100%;background:var(--card);border:1px solid var(--b1);color:var(--tx);padding:11px 140px 11px 42px;border-radius:var(--r);font-size:14px;outline:none;transition:all .15s;font-family:inherit}
+.gsi:focus{border-color:var(--ac)}.gsi::placeholder{color:var(--dm)}
+.gsico{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:var(--mu);font-size:13px}
+.gsbtn{position:absolute;right:7px;top:50%;transform:translateY(-50%)}
+.gans{background:var(--card);border:1px solid var(--b2);border-left:3px solid var(--ac);border-radius:var(--r);padding:14px 16px;margin-bottom:14px;font-size:13px;line-height:1.8;white-space:pre-wrap}
+.gsecs{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.gsec{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:14px;cursor:pointer;transition:all .15s}
+.gsec:hover,.gsec.open{border-color:var(--ac);background:var(--card2)}
+.gsec-i{font-size:20px;margin-bottom:6px}.gsec-t{font-size:13px;font-weight:600;margin-bottom:2px}.gsec-d{font-size:11px;color:var(--mu)}
+.gcont{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:14px;margin-top:12px;line-height:1.75;font-size:12px}
+.gcont h4{color:var(--a2);font-size:11px;margin:10px 0 5px;text-transform:uppercase;letter-spacing:.08em}
+.gcont ul{padding-left:14px}.gcont li{margin-bottom:3px;color:var(--mu)}
+.cli{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:var(--rs);background:var(--card);border:1px solid var(--b1);margin-bottom:5px;cursor:pointer;transition:all .15s}
+.cli:hover{border-color:var(--b2)}.cli.ck{opacity:.52}.cli.ck .clt{text-decoration:line-through;color:var(--mu)}
+.clb{width:16px;height:16px;border-radius:4px;border:2px solid var(--b2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:9px;transition:all .15s}
+.cli.ck .clb{background:var(--grn);border-color:var(--grn);color:#fff}.clt{font-size:12px}
+.prog-dc{background:var(--card);border:1px solid var(--b1);border-left:3px solid var(--grn);border-radius:var(--r);padding:11px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.prog-pc{background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:11px 14px;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.prog-pc.alta{border-left:3px solid var(--red)}.prog-pc.media{border-left:3px solid var(--orn)}.prog-pc.baja{border-left:3px solid var(--grn)}
+.pnum{font-size:10px;font-weight:700;color:var(--dm);width:20px;text-align:center;flex-shrink:0}
+.pbar-w{background:var(--b1);border-radius:20px;height:6px;margin:4px 0 14px;overflow:hidden}
+.pbar{height:100%;border-radius:20px;background:linear-gradient(90deg,var(--ac),var(--a2))}
+.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--grn);margin-right:5px;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.empty{text-align:center;padding:36px 20px;color:var(--mu)}.empty i{font-size:28px;margin-bottom:10px;display:block;color:var(--dm)}
+.spin{width:14px;height:14px;border:2px solid var(--b2);border-top-color:var(--ac);border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
+@keyframes sp{to{transform:rotate(360deg)}}
+#setup{position:fixed;inset:0;background:var(--bg);z-index:1000;display:none;align-items:center;justify-content:center;padding:20px}
+.setup-card{background:var(--card2);border:1px solid var(--b2);border-radius:var(--r);padding:32px;max-width:540px;width:100%}
+.step{display:flex;gap:12px;margin-bottom:12px;padding:12px;background:var(--card);border-radius:var(--rs)}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--ac);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;margin-top:2px}
+.step-t{font-size:13px;font-weight:600;margin-bottom:3px}.step-d{font-size:11px;color:var(--mu);line-height:1.5}
+code{background:var(--sf);border:1px solid var(--b1);border-radius:4px;padding:1px 6px;font-size:11px;color:var(--a2);font-family:monospace}
+@media(max-width:640px){#sb{display:none}#main{padding:14px}.sg{grid-template-columns:repeat(2,1fr)}.tg3{grid-template-columns:1fr}.gsecs{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="setup">
+  <div class="setup-card">
+    <div style="width:42px;height:42px;background:linear-gradient(135deg,var(--ac),var(--a2));border-radius:var(--rs);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px">⚡</div>
+    <div style="font-size:20px;font-weight:700;margin-bottom:6px">Configurar RoderichEvents</div>
+    <div style="font-size:13px;color:var(--mu);margin-bottom:20px;line-height:1.6">Para sincronización en tiempo real entre Federico, Yeni y Rodrigo necesitás conectar Firebase (gratis). 3 pasos simples:</div>
+    <div class="step"><div class="step-num">1</div><div><div class="step-t">Crear proyecto Firebase</div><div class="step-d">Andá a <strong>console.firebase.google.com</strong> → "Crear proyecto" → nombre: <code>roderichevents</code></div></div></div>
+    <div class="step"><div class="step-num">2</div><div><div class="step-t">Activar Realtime Database</div><div class="step-d">Menú → "Realtime Database" → "Crear base de datos" → En <strong>Reglas</strong> pegá: <code>{"rules":{".read":true,".write":true}}</code> y publicá</div></div></div>
+    <div class="step"><div class="step-num">3</div><div><div class="step-t">Pegar la config en el archivo</div><div class="step-d">⚙️ → "Configuración del proyecto" → "Tus apps" → Web → copiá el objeto <code>firebaseConfig</code> y pegalo en <code>FIREBASE_CONFIG</code> al inicio del index.html</div></div></div>
+    <div style="margin-top:16px;font-size:11px;color:var(--dm);text-align:center">Después de editar el archivo, hacé commit y Vercel re-deployea automáticamente.</div>
+  </div>
+</div>
+
+<nav id="sb">
+  <div class="brand">
+    <div class="blogo">⚡</div>
+    <div class="bname">RoderichEvents</div>
+    <div class="bsub">Roderich's Crypto House</div>
+  </div>
+  <div class="navs">
+    <div class="nlbl">Navegación</div>
+    <div class="ni act" data-p="dash"><i class="fas fa-chart-line"></i> Dashboard</div>
+    <div class="ni" data-p="prog"><i class="fas fa-circle-half-stroke"></i> Progreso</div>
+    <div class="ni" data-p="tasks"><i class="fas fa-list-check"></i> Tareas <span class="nbadge" id="nb" style="display:none">0</span></div>
+    <div class="ni" data-p="guide"><i class="fas fa-book-open"></i> Guía</div>
+    <div class="ni" data-p="drive"><i class="fab fa-google-drive"></i> Drive</div>
+    <div class="ni" data-p="settings"><i class="fas fa-gear"></i> Configuración</div>
+  </div>
+  <div class="upnl">
+    <div class="ulbl">Soy yo</div>
+    <div class="ubtn" id="ubtn">
+      <div class="uav" id="sbav"></div>
+      <div><div class="uname" id="sbn"></div><div class="urole" id="sbr"></div></div>
+      <i class="fas fa-chevron-up" style="margin-left:auto;font-size:9px;color:var(--mu)"></i>
+    </div>
+    <div class="udrop" id="udrop"></div>
+  </div>
+</nav>
+<main id="main"></main>
+<div id="mo"><div id="md"></div></div>
+
+<script>
+// =============================================
+// ⚡ PASO 1 — REEMPLAZÁ ESTOS VALORES
+//    con los de tu proyecto Firebase
+// =============================================
+const FIREBASE_CONFIG = {
+  apiKey:            "TU_API_KEY",
+  authDomain:        "TU_PROYECTO.firebaseapp.com",
+  databaseURL:       "https://TU_PROYECTO-default-rtdb.firebaseio.com",
+  projectId:         "TU_PROYECTO",
+  storageBucket:     "TU_PROYECTO.appspot.com",
+  messagingSenderId: "TU_SENDER_ID",
+  appId:             "TU_APP_ID"
+};
+// =============================================
+
+const FB_OK = !FIREBASE_CONFIG.apiKey.includes('TU_');
+let db = null;
+if (FB_OK) { firebase.initializeApp(FIREBASE_CONFIG); db = firebase.database(); }
+else document.getElementById('setup').style.display = 'flex';
+
+// ─── DATOS ────────────────────────────────────
+const U=[
+  {id:'Federico',n:'Federico',role:'Event Production',c:'#7c3aed',bg:'rgba(124,58,237,0.22)'},
+  {id:'Yeni',n:'Yenifer',role:'Coordinación General',c:'#f59e0b',bg:'rgba(245,158,11,0.22)'},
+  {id:'Rodrigo',n:'Rodrigo',role:'Anfitrión / Vocero',c:'#10b981',bg:'rgba(16,185,129,0.22)'},
+];
+const AREAS=['Planificación','Speakers','Sponsor','Comunicación','Plataforma','Logística','Catering','Merchandising','Técnica','Producción','Post-evento','Coordinación'];
+const PRIOS=['Alta','Media','Baja'];
+const STATS=['Pendiente','En progreso','Listo','Cancelado'];
+const EVS=['CryptoTalk for Her','CryptoTalk for Beginners','Próximo evento'];
+const CLI=['Lugar confirmado','Fecha y hora confirmada','Speakers confirmados','Layout armado','Equipos técnicos OK','Catering y bebidas listo','Personal de apoyo confirmado','Decoración y branding','Comunicación: gráficas, copies, links','Merchandising preparado','Fotografía y video confirmados','Lista de invitados','Música o DJ confirmado','Reels / contenido post planificado'];
+const GUIDE={
+  'Pre-producción':{ico:'📋',desc:'4–6 semanas antes',c:`<h4>Definición base</h4><ul><li>Nombre y concepto del evento</li><li>Fecha, hora y duración</li><li>Lugar: RCH / espacio aliado</li><li>Capacidad estimada y formato</li><li>Público objetivo</li></ul><h4>Speakers</h4><ul><li>Selección y confirmación</li><li>Brief (temática, tono, tiempo)</li><li>Verificar audio/presentaciones</li><li>Confirmar horarios y orden</li></ul><h4>Logística</h4><ul><li>Reserva del lugar</li><li>Layout: sillas, mesas, escenario, proyector</li><li>Alquiler: sonido, micrófonos, iluminación</li><li>Decoración: cartel, banner, vinilos, neón, merch</li></ul><h4>Catering</h4><ul><li>Coffee break / cóctel / vino / agua / jugos</li><li>~2 bebidas por persona</li><li>Copas, vasos, hielera, servilletas</li><li>Opciones sin alcohol</li></ul><h4>Comunicación</h4><ul><li>Identidad visual (colores, logo, estética)</li><li>Piezas: feed, stories, banner, reel teaser</li><li>Copy y link de inscripción (Luma o Google Form)</li><li>Pauta orgánica (Instagram, WhatsApp, LinkedIn)</li></ul>`},
+  'Producción':{ico:'🔧',desc:'1–3 días antes',c:`<h4>Preparación final</h4><ul><li>Confirmar speakers y proveedores</li><li>Checklist: vasos, copas, hielo, agua, servilletas, snacks</li><li>Revisar equipo técnico</li><li>Preparar merchandising: tazas, stickers, flyers</li><li>Señalética: entrada, baño, cartel</li><li>Grupo de coordinación (WhatsApp)</li><li>Recordatorio final en redes</li></ul>`},
+  'Ejecución':{ico:'🎤',desc:'Día del evento',c:`<h4>Antes del inicio</h4><ul><li>Llegar 2 horas antes para montaje</li><li>Supervisar catering y orden del espacio</li><li>Revisión técnica final</li><li>Recepción speakers y asistentes</li><li>Música ambiental o DJ</li><li>Fotos del set vacío</li></ul><h4>Durante</h4><ul><li>Apertura institucional (Rodrigo o Yenifer)</li><li>Charla/panel → preguntas → cierre formal</li><li>Networking + catering</li><li>Captura de fotos y videos</li></ul>`},
+  'Post-evento':{ico:'📊',desc:'1–3 días después',c:`<h4>Comunicación</h4><ul><li>Posteo resumen en redes</li><li>Agradecimiento a speakers y asistentes</li><li>Álbum de fotos y reels</li></ul><h4>Evaluación</h4><ul><li>Contar asistentes</li><li>Registrar feedback</li><li>Evaluar tiempos, proveedores, mejoras</li><li>Cerrar gastos y presentar comprobantes</li></ul>`},
+};
+const DT=[
+  {id:1,t:'Definir fecha y horario del evento',a:'Planificación',w:'Yeni',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:2,t:'Confirmar disponibilidad de locación',a:'Planificación',w:'Yeni',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:'MVD Victoria Plaza'},
+  {id:3,t:'Definir capacidad y tipo de acceso',a:'Planificación',w:'Yeni',p:'Media',s:'Pendiente',ev:'CryptoTalk for Her',n:'100 invitados, prioridad mujeres'},
+  {id:4,t:'Confirmar Speaker 1 — ActivaChain',a:'Speakers',w:'Yeni',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:5,t:'Confirmar Speaker 2 — Ana y Ximena',a:'Speakers',w:'Yeni',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:6,t:'Recibir tema, título y descripción de charlas',a:'Speakers',w:'Yeni',p:'Media',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:7,t:'Coordinar horario llegada y requisitos técnicos speakers',a:'Speakers',w:'Federico',p:'Media',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:8,t:'Confirmar Sponsor principal',a:'Sponsor',w:'Rodrigo',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:'Victoria Plaza, Cripto Space'},
+  {id:9,t:'Definir tipo de presencia del sponsor',a:'Sponsor',w:'Rodrigo',p:'Media',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:10,t:'Solicitar logo en alta calidad y bio institucional',a:'Sponsor',w:'Federico',p:'Media',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:11,t:'Solicitar flyer principal del evento',a:'Comunicación',w:'Yeni',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:12,t:'Adaptar piezas gráficas para redes',a:'Comunicación',w:'Yeni',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:13,t:'Coordinar calendario de posteos y pauta',a:'Comunicación',w:'Yeni',p:'Media',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:14,t:'Crear evento en Lu.ma',a:'Plataforma',w:'Yeni',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:15,t:'Difundir link en redes y grupos WA/TG/Discord',a:'Plataforma',w:'Yeni',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:16,t:'Coordinar DJ o música y equipo de sonido',a:'Logística',w:'Federico',p:'Media',s:'Pendiente',ev:'CryptoTalk for Her',n:'Contacto: Ani'},
+  {id:17,t:'Definir y coordinar menú de tragos, comida y snacks',a:'Catering',w:'Federico',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:18,t:'Gestionar compras y presupuesto de catering',a:'Catering',w:'Federico',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:'Comida $16.800 / bebidas $7.000'},
+  {id:19,t:'Revisar y preparar stock de merchandising',a:'Merchandising',w:'Federico',p:'Media',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:20,t:'Confirmar y coordinar técnica del evento',a:'Técnica',w:'Federico',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:'Micros, proyector, luces — Serrana, Fio, Fran'},
+  {id:21,t:'Contratar personal de apoyo',a:'Logística',w:'Federico',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:'Falta filmmaker'},
+  {id:22,t:'Pedir y comparar presupuestos de proveedores',a:'Logística',w:'Federico',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:23,t:'Coordinar entregas de insumos al venue',a:'Logística',w:'Federico',p:'Media',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:24,t:'Señalética: entrada, baño, cartel del evento',a:'Merchandising',w:'Federico',p:'Media',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:25,t:'Montaje y armado del espacio (llegar 2hs antes)',a:'Producción',w:'Federico',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:26,t:'Prueba de sonido, luces y recepción de speakers',a:'Técnica',w:'Federico',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:27,t:'Coordinar flujo: Bienvenida → Charlas → Networking',a:'Producción',w:'Yeni',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:28,t:'Apertura institucional del evento',a:'Producción',w:'Rodrigo',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:29,t:'Supervisión técnica y resolución de imprevistos',a:'Técnica',w:'Federico',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:30,t:'Registro de gastos y presentación de comprobantes',a:'Coordinación',w:'Federico',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:31,t:'Agradecimientos en redes a speakers y sponsors',a:'Post-evento',w:'Yeni',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:32,t:'Subir álbum de fotos y reels a redes',a:'Post-evento',w:'Yeni',p:'Alta',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:33,t:'Encuesta de feedback y registro de aprendizajes',a:'Post-evento',w:'Yeni',p:'Media',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+  {id:34,t:'Archivar materiales visuales para próximos eventos',a:'Post-evento',w:'Federico',p:'Baja',s:'Pendiente',ev:'CryptoTalk for Her',n:''},
+];
+
+// ─── ESTADO ───────────────────────────────────
+let S={
+  tasks:[],cur:localStorage.getItem('re-cur')||'Federico',
+  page:'dash',f:{w:'',a:'',p:'',s:'',q:''},
+  g:{q:'',ans:'',load:false,sec:null},
+  cl:{},uid:1000,udOpen:false,loading:true,
+  emails:{Yeni:'',Rodrigo:''},
+  apiKey:localStorage.getItem('re-apikey')||''
+};
+
+// ─── HELPERS ──────────────────────────────────
+const uu=id=>U.find(x=>x.id===id)||U[0];
+const pc=p=>p==='Alta'?'tpa':p==='Media'?'tpm':'tpb';
+const sc=s=>s==='Pendiente'?'tsp':s==='En progreso'?'tsi':s==='Listo'?'tsl':'tsc';
+const escH=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+// ─── FIREBASE ─────────────────────────────────
+async function persist(){
+  localStorage.setItem('re-cur',S.cur);
+  localStorage.setItem('re-apikey',S.apiKey||'');
+  if(!FB_OK||!db)return;
+  try{
+    await db.ref('re/tasks').set(S.tasks);
+    await db.ref('re/cl').set(S.cl);
+    await db.ref('re/emails').set(S.emails);
+    await db.ref('re/uid').set(S.uid);
+  }catch(e){console.error('Firebase write:',e)}
+}
+
+async function loadData(){
+  if(!FB_OK||!db){S.tasks=DT.map(x=>({...x}));return}
+  try{
+    const snap=await db.ref('re').get();
+    const d=snap.val()||{};
+    S.tasks=d.tasks||DT.map(x=>({...x}));
+    S.cl=d.cl||{};
+    S.emails=d.emails||{};
+    S.uid=d.uid||1000;
+    // Listener tiempo real — actualiza la UI cuando otro usuario cambia algo
+    db.ref('re').on('value',snap=>{
+      const d=snap.val()||{};
+      if(d.tasks)S.tasks=d.tasks;
+      if(d.cl)S.cl=d.cl;
+      if(!S.loading)renderMain();
+    });
+  }catch(e){console.error('Firebase read:',e);S.tasks=DT.map(x=>({...x}))}
+}
+
+// ─── RENDER ───────────────────────────────────
+function render(){renderSB();renderMain()}
+
+function renderSB(){
+  const u=uu(S.cur);
+  const av=document.getElementById('sbav');
+  av.style.background=u.bg;av.style.color=u.c;av.textContent=u.n[0];
+  document.getElementById('sbn').textContent=u.n;
+  document.getElementById('sbr').textContent=u.role;
+  document.querySelectorAll('.ni[data-p]').forEach(el=>el.classList.toggle('act',el.dataset.p===S.page));
+  const pend=S.tasks.filter(t=>t.s==='Pendiente'||t.s==='En progreso').length;
+  const nb=document.getElementById('nb');nb.textContent=pend;nb.style.display=pend?'inline':'none';
+  document.getElementById('udrop').innerHTML=U.map(u=>`
+    <div class="udi ${u.id===S.cur?'sel':''}" onclick="setUser('${u.id}')">
+      <div class="adot" style="background:${u.bg};color:${u.c}">${u.n[0]}</div>
+      <div><div style="font-weight:600;font-size:13px">${u.n}</div><div style="font-size:10px;color:var(--mu)">${u.role}</div></div>
+    </div>`).join('');
+  document.getElementById('udrop').classList.toggle('open',S.udOpen);
+}
+
+function setUser(id){S.cur=id;S.udOpen=false;localStorage.setItem('re-cur',id);render()}
+
+function renderMain(){
+  const m=document.getElementById('main');
+  if(S.loading){m.innerHTML='<div class="empty"><div class="spin" style="width:28px;height:28px;margin:0 auto 12px"></div><p>Cargando...</p></div>';return}
+  const pages={dash:pageDash,prog:pageProg,tasks:pageTasks,guide:pageGuide,drive:pageDrive,settings:pageSettings};
+  m.innerHTML=(pages[S.page]||pageDash)();
+}
+
+// ─── PÁGINAS ──────────────────────────────────
+function liveBanner(){
+  return FB_OK?`<div style="background:var(--grdm);border:1px solid var(--grn);border-radius:var(--rs);padding:8px 12px;font-size:11px;color:var(--grn);display:flex;align-items:center;gap:8px;margin-bottom:14px"><span class="live-dot"></span> En vivo · cambios visibles para todo el equipo</div>`:'';
+}
+
+function pageDash(){
+  const u=uu(S.cur),all=S.tasks;
+  const mine=all.filter(t=>t.w===S.cur);
+  const urg=mine.filter(t=>t.p==='Alta'&&t.s!=='Listo'&&t.s!=='Cancelado');
+  const myPend=mine.filter(t=>t.s!=='Listo'&&t.s!=='Cancelado');
+  const done=all.filter(t=>t.s==='Listo').length;
+  const pend=all.filter(t=>t.s==='Pendiente'||t.s==='En progreso').length;
+  return `${liveBanner()}
+  <div class="ph">
+    <div><div class="ptitle">Hola, ${u.n} 👋</div><div class="psub">Panel principal · RoderichEvents</div></div>
+    <button class="btn btnp" onclick="openAdd()"><i class="fas fa-plus"></i> Nueva tarea</button>
+  </div>
+  <div class="sg">
+    <div class="sc"><div class="sl">Total</div><div class="sv">${all.length}</div><div class="sd">${pend} activas</div></div>
+    <div class="sc"><div class="sl">Mis tareas</div><div class="sv" style="color:var(--a2)">${mine.length}</div><div class="sd">${myPend.length} por hacer</div></div>
+    <div class="sc"><div class="sl">Completadas</div><div class="sv" style="color:var(--grn)">${done}</div><div class="sd">de ${all.length}</div></div>
+    <div class="sc"><div class="sl">Urgentes</div><div class="sv" style="color:var(--red)">${all.filter(t=>t.p==='Alta'&&t.s!=='Listo'&&t.s!=='Cancelado').length}</div><div class="sd">prioridad alta</div></div>
+  </div>
+  <div class="tg3">${U.map(usr=>{
+    const ut=all.filter(t=>t.w===usr.id);
+    return `<div class="tmc"><div class="tmh">
+      <div class="tmav" style="background:${usr.bg};color:${usr.c}">${usr.n[0]}</div>
+      <div><div class="tmn">${usr.n}</div><div class="tmr">${usr.role}</div></div>
+    </div><div class="tmst">
+      <div><div class="tmstv" style="color:var(--a2)">${ut.length}</div><div class="tmstl">total</div></div>
+      <div style="width:1px;background:var(--b1)"></div>
+      <div><div class="tmstv" style="color:var(--grn)">${ut.filter(t=>t.s==='Listo').length}</div><div class="tmstl">listas</div></div>
+      <div><div class="tmstv" style="color:var(--orn)">${ut.filter(t=>t.s!=='Listo'&&t.s!=='Cancelado').length}</div><div class="tmstl">pend.</div></div>
+    </div></div>`;}).join('')}</div>
+  <div class="stitle"><i class="fas fa-fire" style="color:var(--red)"></i> Mis urgentes</div>
+  ${urg.length?urg.map(t=>tCard(t)).join(''):'<div class="empty"><i class="fas fa-check-circle" style="color:var(--grn)"></i><p>Sin urgentes 🎉</p></div>'}
+  <div class="stitle"><i class="fas fa-user" style="color:var(--a2)"></i> Mis tareas pendientes</div>
+  ${myPend.length?myPend.map(t=>tCard(t)).join(''):'<div class="empty"><i class="fas fa-party-horn"></i><p>¡Todo al día!</p></div>'}`;
+}
+
+function pageProg(){
+  const all=S.tasks,done=all.filter(t=>t.s==='Listo'),inprog=all.filter(t=>t.s==='En progreso'),pend=all.filter(t=>t.s==='Pendiente'),can=all.filter(t=>t.s==='Cancelado');
+  const po={Alta:0,Media:1,Baja:2};
+  const active=[...inprog,...pend].sort((a,b)=>(po[a.p]||0)-(po[b.p]||0));
+  const total=all.length-can.length;
+  const pct=total?Math.round(done.length/total*100):0;
+  return `<div class="ph">
+    <div><div class="ptitle">Progreso</div><div class="psub">CryptoTalk for Her · ${done.length}/${total} completadas</div></div>
+    <button class="btn btns" onclick="openEmail()"><i class="fas fa-paper-plane"></i> Enviar resumen</button>
+  </div>
+  <div style="background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:16px 18px;margin-bottom:18px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="font-size:12px;color:var(--mu)">Avance general</span>
+      <span style="font-size:18px;font-weight:700;color:${pct>=70?'var(--grn)':pct>=40?'var(--orn)':'var(--red)'}">${pct}%</span>
+    </div>
+    <div class="pbar-w"><div class="pbar" style="width:${pct}%"></div></div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px">
+      ${[['Listo',done.length,'var(--grn)'],['En progreso',inprog.length,'var(--blu)'],['Pendiente',pend.length,'var(--mu)'],['Cancelado',can.length,'var(--dm)']].map(([l,v,c])=>`
+      <div style="text-align:center;padding:8px;background:var(--sf);border-radius:var(--rs)"><div style="font-size:18px;font-weight:700;color:${c}">${v}</div><div style="font-size:10px;color:var(--mu)">${l}</div></div>`).join('')}
+    </div>
+  </div>
+  <div class="stitle"><i class="fas fa-check-circle" style="color:var(--grn)"></i> Completado (${done.length})</div>
+  ${done.length?done.map(t=>{const u=uu(t.w);return `<div class="prog-dc">
+    <i class="fas fa-check" style="color:var(--grn);font-size:11px;flex-shrink:0"></i>
+    <div style="flex:1"><div style="font-size:13px;font-weight:500">${escH(t.t)}</div><div style="margin-top:3px"><span class="tag ta" style="font-size:9px">${t.a}</span></div></div>
+    <span class="atag"><span class="adot" style="background:${u.bg};color:${u.c}">${u.n[0]}</span>${u.n}</span>
+  </div>`;}).join(''):'<div class="empty" style="padding:20px"><i class="fas fa-hourglass-start"></i><p>Aún no hay tareas completadas</p></div>'}
+  <div class="stitle"><i class="fas fa-clock" style="color:var(--orn)"></i> Pendientes por prioridad (${active.length})</div>
+  ${active.length?active.map((t,i)=>{const u=uu(t.w);return `<div class="prog-pc ${t.p.toLowerCase()}">
+    <div class="pnum">${i+1}</div>
+    <div style="flex:1"><div style="font-size:13px;font-weight:500">${escH(t.t)}</div>
+    <div style="margin-top:3px;display:flex;gap:4px;flex-wrap:wrap"><span class="tag ${pc(t.p)}" style="font-size:9px">${t.p}</span><span class="tag ta" style="font-size:9px">${t.a}</span>${t.s==='En progreso'?'<span class="tag tsi" style="font-size:9px">En progreso</span>':''}</div></div>
+    <span class="atag"><span class="adot" style="background:${u.bg};color:${u.c}">${u.n[0]}</span>${u.n}</span>
+  </div>`;}).join(''):'<div class="empty" style="padding:20px"><i class="fas fa-check-double" style="color:var(--grn)"></i><p>¡Todo completado!</p></div>'}`;
+}
+
+function pageTasks(){
+  let ts=[...S.tasks];
+  if(S.f.w)ts=ts.filter(t=>t.w===S.f.w);
+  if(S.f.a)ts=ts.filter(t=>t.a===S.f.a);
+  if(S.f.p)ts=ts.filter(t=>t.p===S.f.p);
+  if(S.f.s)ts=ts.filter(t=>t.s===S.f.s);
+  if(S.f.q){const q=S.f.q.toLowerCase();ts=ts.filter(t=>t.t.toLowerCase().includes(q)||(t.n||'').toLowerCase().includes(q))}
+  const po={Alta:0,Media:1,Baja:2},so={Pendiente:0,'En progreso':1,Listo:2,Cancelado:3};
+  ts.sort((a,b)=>(so[a.s]||0)-(so[b.s]||0)||(po[a.p]||0)-(po[b.p]||0));
+  const hasF=S.f.w||S.f.a||S.f.p||S.f.s||S.f.q;
+  return `<div class="ph">
+    <div><div class="ptitle">Tareas</div><div class="psub">${ts.length} resultado${ts.length!==1?'s':''}</div></div>
+    <button class="btn btnp" onclick="openAdd()"><i class="fas fa-plus"></i> Nueva</button>
+  </div>
+  <div class="fb">
+    <input class="sinput" placeholder="🔍 Buscar..." value="${escH(S.f.q)}" oninput="S.f.q=this.value;renderMain()">
+    <select class="fsel" onchange="S.f.w=this.value;renderMain()"><option value="">👤 Todos</option>${U.map(u=>`<option value="${u.id}" ${S.f.w===u.id?'selected':''}>${u.n}</option>`).join('')}</select>
+    <select class="fsel" onchange="S.f.a=this.value;renderMain()"><option value="">📁 Área</option>${AREAS.map(a=>`<option value="${a}" ${S.f.a===a?'selected':''}>${a}</option>`).join('')}</select>
+    <select class="fsel" onchange="S.f.p=this.value;renderMain()"><option value="">🔥 Prioridad</option>${PRIOS.map(p=>`<option value="${p}" ${S.f.p===p?'selected':''}>${p}</option>`).join('')}</select>
+    <select class="fsel" onchange="S.f.s=this.value;renderMain()"><option value="">📌 Estado</option>${STATS.map(s=>`<option value="${s}" ${S.f.s===s?'selected':''}>${s}</option>`).join('')}</select>
+    ${hasF?`<button class="btn btng" onclick="S.f={w:'',a:'',p:'',s:'',q:''};renderMain()"><i class="fas fa-xmark"></i></button>`:''}
+  </div>
+  ${ts.length?ts.map(t=>tCard(t)).join(''):'<div class="empty"><i class="fas fa-search"></i><p>Sin resultados</p></div>'}`;
+}
+
+function tCard(t){
+  const u=uu(t.w),done=t.s==='Listo',prog=t.s==='En progreso',can=t.s==='Cancelado';
+  return `<div class="tc ${done?'done':''} ${can?'cancelled':''}">
+    <div class="chk ${done?'done':prog?'prog':can?'cancelled':''}" onclick="cycleS(${t.id})">${done?'<i class="fas fa-check"></i>':prog?'<i class="fas fa-ellipsis"></i>':can?'<i class="fas fa-xmark"></i>':''}</div>
+    <div class="tb">
+      <div class="tt">${escH(t.t)}</div>
+      <div class="tm">
+        <span class="tag ta">${t.a}</span><span class="tag ${pc(t.p)}">${t.p}</span><span class="tag ${sc(t.s)}">${t.s}</span>
+        <span class="atag"><span class="adot" style="background:${u.bg};color:${u.c}">${u.n[0]}</span>${u.n}</span>
+        ${t.ev?`<span style="font-size:10px;color:var(--mu)">· ${t.ev}</span>`:''}
+      </div>
+      ${t.n?`<div class="tnotes">${escH(t.n)}</div>`:''}
+    </div>
+    <div class="tacts">
+      <div class="tab2" onclick="openEdit(${t.id})"><i class="fas fa-pen"></i></div>
+      <div class="tab2 red" onclick="delT(${t.id})"><i class="fas fa-trash"></i></div>
+    </div>
+  </div>`;
+}
+
+function cycleS(id){
+  const t=S.tasks.find(x=>x.id===id);if(!t)return;
+  const c=['Pendiente','En progreso','Listo'],i=c.indexOf(t.s);
+  t.s=i===-1?'Listo':c[(i+1)%c.length];
+  persist();render();
+}
+function delT(id){if(!confirm('¿Eliminar esta tarea?'))return;S.tasks=S.tasks.filter(x=>x.id!==id);persist();render()}
+
+function tForm(t){
+  return `<div class="mtitle">${t?'Editar tarea':'✨ Nueva tarea'}</div>
+  <div class="fg"><label class="fl">Título</label><input class="fi" id="ft" value="${t?escH(t.t):''}" placeholder="Nombre de la tarea"></div>
+  <div class="fr2">
+    <div class="fg"><label class="fl">Área</label><select class="fse" id="fa">${AREAS.map(a=>`<option ${t&&t.a===a?'selected':''}>${a}</option>`).join('')}</select></div>
+    <div class="fg"><label class="fl">Responsable</label><select class="fse" id="fw">${U.map(u=>`<option value="${u.id}" ${t&&t.w===u.id?'selected':''}>${u.n}</option>`).join('')}</select></div>
+  </div>
+  <div class="fr2">
+    <div class="fg"><label class="fl">Prioridad</label><select class="fse" id="fp">${PRIOS.map(p=>`<option ${t&&t.p===p?'selected':''}>${p}</option>`).join('')}</select></div>
+    <div class="fg"><label class="fl">Estado</label><select class="fse" id="fs">${STATS.map(s=>`<option ${t&&t.s===s?'selected':''}>${s}</option>`).join('')}</select></div>
+  </div>
+  <div class="fg"><label class="fl">Evento</label><select class="fse" id="fe"><option value="">Sin asignar</option>${EVS.map(e=>`<option ${t&&t.ev===e?'selected':''}>${e}</option>`).join('')}</select></div>
+  <div class="fg"><label class="fl">Notas</label><textarea class="ft" id="fn" placeholder="Proveedores, referencias...">${t?escH(t.n||''):''}</textarea></div>
+  <div class="macts">
+    <button class="btn btng" onclick="closeMO()">Cancelar</button>
+    <button class="btn btnp" onclick="saveT(${t?t.id:'null'})">${t?'Guardar':'Crear tarea'}</button>
+  </div>`;
+}
+
+function openAdd(){document.getElementById('md').innerHTML=tForm(null);document.getElementById('mo').classList.add('open')}
+function openEdit(id){const t=S.tasks.find(x=>x.id===id);if(!t)return;document.getElementById('md').innerHTML=tForm(t);document.getElementById('mo').classList.add('open')}
+function closeMO(){document.getElementById('mo').classList.remove('open')}
+
+function saveT(id){
+  const title=(document.getElementById('ft').value||'').trim();
+  if(!title){alert('El título es obligatorio');return}
+  const d={t:title,a:document.getElementById('fa').value,w:document.getElementById('fw').value,p:document.getElementById('fp').value,s:document.getElementById('fs').value,ev:document.getElementById('fe').value,n:(document.getElementById('fn').value||'').trim()};
+  if(id&&id!=='null'){const t=S.tasks.find(x=>x.id===id);if(t)Object.assign(t,d)}
+  else{S.uid++;S.tasks.push({id:S.uid,...d})}
+  closeMO();persist();render();
+}
+
+function genSummary(){
+  const all=S.tasks,done=all.filter(t=>t.s==='Listo'),prog=all.filter(t=>t.s==='En progreso'),pend=all.filter(t=>t.s==='Pendiente');
+  const total=all.filter(t=>t.s!=='Cancelado').length,pct=total?Math.round(done.length/total*100):0;
+  const hoy=new Date().toLocaleDateString('es-UY',{day:'2-digit',month:'2-digit',year:'numeric'});
+  let txt=`📋 RESUMEN — RODERICHEVENTS\n📅 ${hoy} · 🎯 CryptoTalk for Her\n━━━━━━━━━━━━━━━━━━━━━\n📊 AVANCE: ${pct}% (${done.length}/${total})\n━━━━━━━━━━━━━━━━━━━━━\n\n`;
+  if(done.length){txt+=`✅ COMPLETADO:\n`;done.forEach(t=>{txt+=`  • ${t.t} — ${uu(t.w).n}\n`});txt+='\n'}
+  if(prog.length){txt+=`🔵 EN PROGRESO:\n`;prog.forEach(t=>{txt+=`  • ${t.t} — ${uu(t.w).n}\n`});txt+='\n'}
+  const urgPend=pend.filter(t=>t.p==='Alta');
+  if(urgPend.length){txt+=`🔴 URGENTE:\n`;urgPend.forEach(t=>{txt+=`  • ${t.t} — ${uu(t.w).n}\n`});txt+='\n'}
+  const resto=pend.filter(t=>t.p!=='Alta');
+  if(resto.length){txt+=`⏳ PENDIENTE:\n`;resto.forEach(t=>{txt+=`  • [${t.p}] ${t.t} — ${uu(t.w).n}\n`})}
+  return txt+'\n— RoderichEvents App';
+}
+
+function openEmail(){
+  const summary=genSummary();
+  document.getElementById('md').innerHTML=`
+  <div class="mtitle"><i class="fas fa-paper-plane" style="color:var(--grn)"></i> Enviar resumen</div>
+  <div class="fg"><label class="fl">Destinatario</label>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      ${['Yeni','Rodrigo'].map(n=>`<button class="btn btng" onclick="pickEmail('${n}')">
+        <div class="adot" style="background:${uu(n).bg};color:${uu(n).c};width:16px;height:16px">${uu(n).n[0]}</div>${uu(n).n}
+        ${S.emails[n]?'<i class="fas fa-check" style="color:var(--grn);font-size:10px"></i>':''}
+      </button>`).join('')}
+    </div>
+    <input class="fi" id="email-to" placeholder="o escribí el mail..." value="">
+  </div>
+  <div class="fg"><label class="fl">Resumen</label>
+    <div style="background:var(--sf);border:1px solid var(--b1);border-radius:var(--rs);padding:12px;font-size:11px;color:var(--mu);line-height:1.7;max-height:180px;overflow-y:auto;white-space:pre-wrap;font-family:monospace">${escH(summary)}</div>
+  </div>
+  <div class="macts">
+    <button class="btn btng" onclick="closeMO()">Cancelar</button>
+    <button class="btn btns" onclick="sendEmail()"><i class="fas fa-paper-plane"></i> Abrir en mail</button>
+  </div>`;
+  document.getElementById('mo').classList.add('open');
+}
+
+function pickEmail(name){
+  const input=prompt(`Mail de ${name}:`,S.emails[name]||'');
+  if(input===null)return;
+  S.emails[name]=input.trim();persist();openEmail();
+  setTimeout(()=>{const el=document.getElementById('email-to');if(el)el.value=input.trim()},50);
+}
+function sendEmail(){
+  const to=(document.getElementById('email-to').value||'').trim();
+  if(!to){alert('Ingresá un email primero');return}
+  window.open(`mailto:${to}?subject=${encodeURIComponent('Resumen — CryptoTalk for Her')}&body=${encodeURIComponent(genSummary())}`,'_blank');
+}
+
+function pageGuide(){
+  const sec=S.g.sec,hasKey=!!S.apiKey;
+  return `<div class="ph"><div class="ptitle">Guía CryptoTalk</div><div class="psub">Referencia operativa del evento</div></div>
+  ${hasKey?`<div class="gsbox">
+    <i class="fas fa-search gsico"></i>
+    <input class="gsi" id="gq" placeholder="Preguntá algo sobre el evento..." value="${escH(S.g.q)}">
+    <button class="btn btnp gsbtn" onclick="askGuide()">${S.g.load?'<span class="spin"></span>':'<i class="fas fa-bolt"></i> Preguntar'}</button>
+  </div>
+  ${S.g.ans?`<div class="gans"><span style="font-size:10px;color:var(--mu);display:block;margin-bottom:8px">⚡ Respuesta IA</span>${escH(S.g.ans)}</div>`:''}`
+  :`<div style="background:var(--card);border:1px solid var(--b1);border-radius:var(--rs);padding:12px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:center;font-size:12px;color:var(--mu)">
+    <i class="fas fa-key" style="color:var(--gld)"></i>
+    Para activar el buscador con IA, agregá tu API key de Anthropic en <span style="color:var(--a2);cursor:pointer;font-weight:600" onclick="S.page='settings';render()">Configuración</span>.
+  </div>`}
+  <div class="gsecs">${Object.entries(GUIDE).map(([k,v])=>`
+    <div class="gsec ${sec===k?'open':''}" onclick="toggleSec('${k}')">
+      <div class="gsec-i">${v.ico}</div><div class="gsec-t">${k}</div><div class="gsec-d">${v.desc}</div>
+    </div>`).join('')}</div>
+  ${sec&&GUIDE[sec]?`<div class="gcont">${GUIDE[sec].c}</div>`:''}
+  <div class="stitle" style="margin-top:20px"><i class="fas fa-list-check"></i> Checklist rápida</div>
+  ${CLI.map((item,i)=>`<div class="cli ${S.cl[i]?'ck':''}" onclick="toggleCL(${i})">
+    <div class="clb">${S.cl[i]?'<i class="fas fa-check"></i>':''}</div><span class="clt">${item}</span>
+  </div>`).join('')}`;
+}
+
+function toggleSec(k){S.g.sec=S.g.sec===k?null:k;renderMain()}
+function toggleCL(i){S.cl[i]=!S.cl[i];persist();renderMain()}
+
+async function askGuide(){
+  const el=document.getElementById('gq');
+  const q=(el?el.value:'').trim();
+  if(!q||S.g.load||!S.apiKey)return;
+  S.g.q=q;S.g.load=true;S.g.ans='';renderMain();
+  try{
+    const ctx=Object.entries(GUIDE).map(([k,v])=>`${k}:\n${v.c.replace(/<[^>]*>/g,'')}`).join('\n\n');
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':S.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,
+        system:`Asistente de eventos Roderich's Crypto House, Montevideo. Respondé en español rioplatense. Federico (logística, catering, técnica), Yenifer (coordinación, comunicación), Rodrigo (anfitrión). Guía:\n${ctx}`,
+        messages:[{role:'user',content:q}]
+      })});
+    const d=await r.json();
+    S.g.ans=(d.content||[]).find(b=>b.type==='text')?.text||'Sin respuesta.';
+  }catch(e){S.g.ans='Error: '+e.message}
+  S.g.load=false;renderMain();
+}
+
+function pageDrive(){
+  return `<div class="ph"><div class="ptitle">Google Drive</div><div class="psub">Archivos del equipo</div></div>
+  <div style="background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:16px 18px;margin-bottom:12px;display:flex;align-items:center;gap:14px">
+    <div style="font-size:26px">📁</div>
+    <div style="flex:1"><div style="font-size:14px;font-weight:600;margin-bottom:3px">Eventos</div><div style="font-size:11px;color:var(--mu)">marketingroderichs@gmail.com · Carpeta compartida</div></div>
+    <a style="padding:7px 13px;border-radius:var(--rs);background:var(--adm);color:var(--a2);border:1px solid var(--ac);font-size:12px;display:inline-flex;align-items:center;gap:5px" href="https://drive.google.com/drive/folders/1zkOKA_xE1ty4OdhfZtfWeQk4w6lYzwBi" target="_blank"><i class="fab fa-google-drive"></i> Abrir</a>
+  </div>
+  ${[['📄','Planillas de planificación','Cronogramas, checklist, presupuestos'],['🖼','Materiales gráficos','Flyers, banners, piezas para redes'],['📸','Fotos y videos','Contenido para reels y álbum'],['💰','Presupuestos y comprobantes','Facturas y cotizaciones'],['📋','Contratos y documentos','Acuerdos con speakers, sponsors, técnicos']].map(([ico,t,d])=>`
+  <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;background:var(--card);border:1px solid var(--b1);border-radius:var(--rs);margin-bottom:6px">
+    <div style="font-size:20px">${ico}</div>
+    <div><div style="font-size:13px;font-weight:600">${t}</div><div style="font-size:11px;color:var(--mu)">${d}</div></div>
+  </div>`).join('')}`;
+}
+
+function pageSettings(){
+  return `<div class="ph"><div class="ptitle">Configuración</div></div>
+  <div style="background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:18px;margin-bottom:12px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:4px">🔥 Estado Firebase</div>
+    <div style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:8px">
+      <div style="width:8px;height:8px;border-radius:50%;background:${FB_OK?'var(--grn)':'var(--red)'}"></div>
+      ${FB_OK?'Conectado — sincronización en tiempo real activa':'No configurado — completá FIREBASE_CONFIG en el archivo'}
+    </div>
+    <div style="font-size:11px;color:var(--mu)">Los datos se comparten entre Federico, Yeni y Rodrigo en tiempo real.</div>
+  </div>
+  <div style="background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:18px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:4px">🔑 API Key de Anthropic</div>
+    <div style="font-size:11px;color:var(--mu);margin-bottom:12px">Opcional. Activa el buscador con IA en la Guía. Obtenela en console.anthropic.com → API Keys</div>
+    <input class="fi" id="api-key-input" type="password" placeholder="sk-ant-..." value="${escH(S.apiKey||'')}">
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn btnp" onclick="saveApiKey()"><i class="fas fa-check"></i> Guardar</button>
+      ${S.apiKey?`<button class="btn btng" onclick="S.apiKey='';localStorage.removeItem('re-apikey');renderMain()">Borrar</button>`:''}
+    </div>
+  </div>`;
+}
+
+function saveApiKey(){
+  const key=(document.getElementById('api-key-input').value||'').trim();
+  S.apiKey=key;localStorage.setItem('re-apikey',key);
+  alert(key?'✅ API Key guardada. Ya podés usar la Guía con IA.':'API Key eliminada.');
+  renderMain();
+}
+
+// ─── EVENTOS ──────────────────────────────────
+document.querySelectorAll('.ni[data-p]').forEach(el=>{el.addEventListener('click',()=>{S.page=el.dataset.p;render()})});
+document.getElementById('ubtn').addEventListener('click',e=>{e.stopPropagation();S.udOpen=!S.udOpen;renderSB()});
+document.addEventListener('click',e=>{if(S.udOpen&&!e.target.closest('.upnl')){S.udOpen=false;renderSB()}});
+document.getElementById('mo').addEventListener('click',e=>{if(e.target===document.getElementById('mo'))closeMO()});
+
+// ─── INICIO ───────────────────────────────────
+(async()=>{await loadData();S.loading=false;render()})();
+</script>
+</body>
+</html>
