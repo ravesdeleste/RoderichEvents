@@ -349,11 +349,19 @@ let S={
 
 // ─── HELPERS ──────────────────────────────────
 const uu=id=>{
+  // Si hay colabPerfil activo y coincide con el id pedido, usarlo directamente
+  if(S.colabPerfil&&S.colabPerfil.uid===id){
+    return {id:S.colabPerfil.uid,n:S.colabPerfil.nombre||S.colabPerfil.email,role:'Colaborador',c:'#06b6d4',bg:'rgba(6,182,212,0.18)'};
+  }
   const found=U.find(x=>x.id===id);
   if(found)return found;
   // Fallback para colaboradores no cargados aún
   const colab=(S.colabs||[]).find(c=>c.uid===id);
   if(colab)return {id:colab.uid,n:colab.nombre||colab.email,role:'Colaborador',c:'#06b6d4',bg:'rgba(6,182,212,0.18)'};
+  // Si hay colabPerfil aunque el id no coincida exacto, mostrar al colaborador igual
+  if(S.colabPerfil){
+    return {id:S.colabPerfil.uid,n:S.colabPerfil.nombre||S.colabPerfil.email,role:'Colaborador',c:'#06b6d4',bg:'rgba(6,182,212,0.18)'};
+  }
   return U[0];
 };
 const pc=p=>p==='Alta'?'tpa':p==='Media'?'tpm':'tpb';
