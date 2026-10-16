@@ -341,7 +341,7 @@ let S={
   tasks:[],cur:localStorage.getItem('re-cur')||'Federico',
   page:'dash',f:{w:'',a:'',p:'',s:'',q:''},
   g:{q:'',ans:'',load:false,sec:null},
-  cl:{},uid:1000,udOpen:false,loading:true,
+  cl:{},uid:1000,udOpen:false,loading:true,authReady:false,
   emails:{Yeni:'',Rodrigo:''},
   apiKey:localStorage.getItem('re-apikey')||'',
   colabs:[]
@@ -437,10 +437,10 @@ function renderSB(){
   const unEl=document.getElementById('mobnav-uname');if(unEl)unEl.textContent=uu(S.cur).n.split(' ')[0];
   const pend=S.tasks.filter(t=>t.s==='Pendiente'||t.s==='En progreso').length;
   const nb=document.getElementById('nb');nb.textContent=pend;nb.style.display=pend?'inline':'none';
-  const esColab=!!S.colabPerfil;
+  const esColab=!!S.colabPerfil || !S.authReady;
   const ubtn=document.getElementById('ubtn');
   if(esColab){
-    // Colaborador: ocultar dropdown, deshabilitar click
+    // Colaborador (o auth aún no confirmada): ocultar dropdown
     if(ubtn)ubtn.style.cursor='default';
     document.getElementById('udrop').innerHTML='';
     document.getElementById('udrop').classList.remove('open');
@@ -839,6 +839,7 @@ async function doLogin(){
     localStorage.setItem('re-cur',S.cur);
     localStorage.setItem('re-login-ts',Date.now().toString());
     isLoginModal=false;
+    S.authReady=true;
     closeMO();
     render();
     showToast('👋 Bienvenido!');
@@ -1229,7 +1230,7 @@ function saveApiKey(){
 
 // ─── EVENTOS ──────────────────────────────────
 document.querySelectorAll('.ni[data-p]').forEach(el=>{el.addEventListener('click',()=>{S.page=el.dataset.p;render()})});
-document.getElementById('ubtn').addEventListener('click',e=>{e.stopPropagation();if(S.colabPerfil)return;S.udOpen=!S.udOpen;renderSB()});
+document.getElementById('ubtn').addEventListener('click',e=>{e.stopPropagation();if(S.colabPerfil||!S.authReady)return;S.udOpen=!S.udOpen;renderSB()});
 document.addEventListener('click',e=>{if(S.udOpen&&!e.target.closest('.upnl')){S.udOpen=false;renderSB()}});
 document.getElementById('mo').addEventListener('click',e=>{if(e.target===document.getElementById('mo'))closeMO()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!isLoginModal)closeMO()});
@@ -1267,15 +1268,18 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!isLoginModal)close
         }
         localStorage.setItem('re-cur',S.cur);
         isLoginModal=false;
+        S.authReady=true;
         loadColabs();
       } else {
         // No hay sesión → mostrar login
+        S.authReady=true;
         openLoginPicker();
       }
       render();
     });
   } else {
     const saved=localStorage.getItem('re-cur');
+    S.authReady=true;
     if(!saved) openLoginPicker();
     render();
   }
