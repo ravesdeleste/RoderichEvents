@@ -1185,52 +1185,20 @@ async function crearUsuario(){
 function pageSettings(){
   return `<div class="ph"><div class="ptitle">Configuración</div></div>
   <div style="background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:18px;margin-bottom:12px">
-    <div style="font-size:13px;font-weight:600;margin-bottom:4px">🔥 Estado Firebase</div>
-    <div style="display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:12px">
-      <div style="width:8px;height:8px;border-radius:50%;background:${FB_OK?'var(--grn)':'var(--red)'}"></div>
-      ${FB_OK?'Config cargada — probá la conexión abajo':'No configurado — completá FIREBASE_CONFIG en el archivo'}
-    </div>
-    <button class="btn btng" id="fb-test-btn" onclick="testFirebase()"><i class="fas fa-plug"></i> Testear conexión</button>
-    <div id="fb-test-res" style="margin-top:10px;font-size:12px;line-height:1.6"></div>
-    <div style="margin-top:12px;background:var(--sf);border-radius:var(--rs);padding:10px 12px;font-size:11px;color:var(--mu);line-height:1.6">
-      <strong style="color:var(--tx)">Si el test falla:</strong><br>
-      1. Andá a console.firebase.google.com → tu proyecto → Realtime Database → <strong>Reglas</strong><br>
-      2. Asegurate que diga exactamente: <code>{"rules":{".read":true,".write":true}}</code><br>
-      3. Hacé clic en <strong>Publicar</strong> (si no publicaste, las reglas no aplican)
-    </div>
-  </div>
-  <div style="background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:18px;margin-bottom:12px">
-    <div style="font-size:13px;font-weight:600;margin-bottom:4px">📊 Google Sheets</div>
+    <div style="font-size:13px;font-weight:600;margin-bottom:10px">📊 Google Sheets</div>
     <div style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:10px">
       <div style="width:8px;height:8px;border-radius:50%;background:${SHEETS_WEBHOOK_URL?'var(--grn)':'var(--dm)'}"></div>
       ${SHEETS_WEBHOOK_URL?'Script conectado — sincronización activa':'Sin URL de script — solo lectura'}
     </div>
-    ${!SHEETS_WEBHOOK_URL?`<div style="background:var(--sf);border-radius:var(--rs);padding:10px 12px;font-size:11px;color:var(--mu);line-height:1.8;margin-bottom:12px">
-      <strong style="color:var(--tx)">Para conectar la planilla:</strong><br>
-      1. Abrí la planilla → <strong>Extensiones → Apps Script</strong><br>
-      2. Pegá el código del archivo <code>sheets_script.gs</code><br>
-      3. <strong>Implementar → Nueva implementación → Web App</strong><br>
-      &nbsp;&nbsp;&nbsp;· Ejecutar como: <em>Yo</em> · Acceso: <em>Cualquier persona</em><br>
-      4. Copiá la URL y pegala en <code>SHEETS_WEBHOOK_URL</code> del index.html
-    </div>`:''}
     <button class="btn btns" onclick="syncFromSheets()"><i class="fas fa-rotate"></i> Sincronizar desde planilla</button>
     <div style="font-size:10px;color:var(--dm);margin-top:8px">Importa tareas nuevas de las pestañas: ${SHEET_EVENTOS.join(', ')}</div>
   </div>
-  <div style="background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:18px">
-    <div style="font-size:13px;font-weight:600;margin-bottom:4px">🔑 API Key de Anthropic</div>
-    <div style="font-size:11px;color:var(--mu);margin-bottom:12px">Opcional. Activa el buscador con IA en la Guía. Obtenela en console.anthropic.com → API Keys</div>
-    <input class="fi" id="api-key-input" type="password" placeholder="sk-ant-..." value="${escH(S.apiKey||'')}">
-    <div style="display:flex;gap:8px;margin-top:10px">
-      <button class="btn btnp" onclick="saveApiKey()"><i class="fas fa-check"></i> Guardar</button>
-      ${S.apiKey?`<button class="btn btng" onclick="S.apiKey='';localStorage.removeItem('re-apikey');renderMain()">Borrar</button>`:''}
-    </div>
-  </div>
   ${ADMIN_EMAILS.includes(S.colabPerfil?.email||USER_EMAILS[S.cur]||'')?`
-  <div style="background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:18px;margin-top:12px">
+  <div style="background:var(--card);border:1px solid var(--b1);border-radius:var(--r);padding:18px;margin-bottom:12px">
     <div style="font-size:13px;font-weight:600;margin-bottom:12px">👥 Usuarios</div>
     <button class="btn btnp" onclick="S.page='usuarios';render()"><i class="fas fa-users-cog"></i> Gestionar usuarios</button>
   </div>`:''}
-  <div style="margin-top:16px">
+  <div style="margin-top:4px">
     <button class="btn" style="background:rgba(239,68,68,0.15);color:#ef4444;border:1px solid rgba(239,68,68,0.3);width:100%;padding:12px" onclick="cerrarSesion()">
       <i class="fas fa-sign-out-alt"></i> Cerrar sesión
     </button>
