@@ -207,6 +207,10 @@ code{background:var(--sf);border:1px solid var(--b1);border-radius:4px;padding:1
       <i class="fas fa-chevron-up" style="margin-left:auto;font-size:9px;color:var(--mu)"></i>
     </div>
     <div class="udrop" id="udrop"></div>
+    <button onclick="cerrarSesion()" title="Cerrar sesión"
+      style="margin-top:6px;width:100%;padding:7px;border-radius:7px;border:1px solid rgba(239,68,68,0.25);background:rgba(239,68,68,0.08);color:#ef4444;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;font-family:inherit">
+      <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+    </button>
   </div>
 </nav>
 <main id="main"></main>
@@ -821,6 +825,7 @@ async function doLogin(){
       }
     }
     localStorage.setItem('re-cur',S.cur);
+    localStorage.setItem('re-login-ts',Date.now().toString());
     isLoginModal=false;
     closeMO();
     render();
@@ -1223,8 +1228,13 @@ function pageSettings(){
 async function cerrarSesion(){
   if(!confirm('¿Cerrar sesión?'))return;
   localStorage.removeItem('re-cur');
+  localStorage.removeItem('re-login-ts');
   S.cur='';
   S.colabPerfil=null;
+  S.colabs=[];
+  // Limpiar colaboradores del array U
+  const baseIds=['Federico','Yeni','Rodrigo'];
+  while(U.length>3)U.pop();
   if(auth)await auth.signOut();
   isLoginModal=false;
   openLoginPicker();
@@ -1254,6 +1264,18 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!isLoginModal)close
     // Usar Firebase Auth para detectar sesión existente
     auth.onAuthStateChanged(async user=>{
       if(user){
+        // Verificar que no pasaron más de 24hs desde el último login
+        const loginTs=parseInt(localStorage.getItem('re-login-ts')||'0');
+        const HS_24=24*60*60*1000;
+        if(loginTs && Date.now()-loginTs > HS_24){
+          // Sesión expirada → logout y pedir login de nuevo
+          localStorage.removeItem('re-cur');
+          localStorage.removeItem('re-login-ts');
+          await auth.signOut();
+          openLoginPicker();
+          render();
+          return;
+        }
         const fbEmail=user.email;
         if(EMAIL_TO_ID[fbEmail]){
           S.cur=EMAIL_TO_ID[fbEmail];
