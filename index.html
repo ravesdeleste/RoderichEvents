@@ -446,7 +446,9 @@ function renderSB(){
     document.getElementById('udrop').classList.remove('open');
   } else {
     if(ubtn)ubtn.style.cursor='pointer';
-    document.getElementById('udrop').innerHTML=U.map(u=>`
+    // Solo mostrar usuarios base (no colaboradores) en el switcher
+    const usuariosBase=U.filter(u=>!u.esColab);
+    document.getElementById('udrop').innerHTML=usuariosBase.map(u=>`
       <div class="udi ${u.id===S.cur?'sel':''}" onclick="setUser('${u.id}')">
         <div class="adot" style="background:${u.bg};color:${u.c}">${u.n[0]}</div>
         <div><div style="font-weight:600;font-size:13px">${u.n}</div><div style="font-size:10px;color:var(--mu)">${u.role}</div></div>
